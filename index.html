@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Surat Masa Depan | Future Mail</title>
+    <link rel="icon" type="image/png" href="jam.jpg.jpeg"> 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- EmailJS CDN -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    
+    <style>
+        /* Reset CSS */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .title {
+            font-size: 32px;
+            margin-bottom: 25px;
+            color: #2c3e50;
+            text-align: center;
+            font-weight: 700;
+        }
+        
+        .subtitle {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #333;
+            text-align: center;
+        }
+        
+        .top-row-content {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 25px;
+        }
+        
+        .letter-column {
+            flex: 2;
+        }
+        
+        .recipient-column {
+            flex: 1;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+        
+        textarea, input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            margin-bottom: 15px;
+            transition: border-color 0.3s;
+        }
+        
+        textarea:focus, input:focus {
+            outline: none;
+            border-color: #4a90e2;
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 200px;
+        }
+        
+        .actions {
+            margin-top: 20px;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .btn.primary {
+            background: #4a90e2;
+            color: white;
+        }
+        
+        .btn.primary:hover {
+            background: #3a7bc8;
+        }
+        
+        .bottom-row-content {
+            margin-top: 20px;
+        }
+        
+        .delivery-time-inputs {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .inline {
+            flex: 1;
+        }
+        
+        .hint {
+            display: block;
+            margin-top: 15px;
+            color: #666;
+            font-style: italic;
+            text-align: center;
+        }
+        
+        /* Pending Letters Section */
+        .pending-letters-section {
+            margin-top: 30px;
+            width: 100%;
+        }
+        
+        .letter-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .no-letters {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            padding: 20px;
+        }
+        
+        .letter-item {
+            background: #fff;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+        
+        .letter-item:hover {
+            transform: translateY(-3px);
+        }
+        
+        .letter-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .letter-header h3 {
+            margin: 0;
+            font-size: 18px;
+            color: #333;
+        }
+        
+        .letter-status {
+            background: #ffc107;
+            color: #333;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .letter-details p {
+            margin: 5px 0;
+            font-size: 14px;
+            color: #555;
+        }
+        
+        .letter-actions {
+            margin-top: 10px;
+            text-align: right;
+        }
+        
+        .btn.small {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+        
+        .btn.danger {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .btn.danger:hover {
+            background: #c82333;
+        }
+        
+        /* Status Bar */
+        .status {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            z-index: 100;
+        }
+        
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+        
+        .modal-close-btn {
+            margin-top: 15px;
+            padding: 8px 16px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .modal-close-btn:hover {
+            background: #0069d9;
+        }
+        
+        /* Send Animation */
+        #send-animation-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 1000;
+        }
+        
+        .envelope-container {
+            margin-bottom: 20px;
+        }
+        
+        .envelope {
+            font-size: 60px;
+            color: #fff;
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        
+        .animation-text {
+            color: #fff;
+            font-size: 18px;
+            text-align: center;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .top-row-content {
+                flex-direction: column;
+            }
+            
+            .letter-column, .recipient-column {
+                width: 100%;
+                margin-bottom: 20px;
+            }
+            
+            .bottom-row-content {
+                flex-direction: column;
+            }
+            
+            .delivery-time-inputs {
+                flex-direction: column;
+            }
+            
+            .inline {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="auth-status" class="status">Menghubungkan ke server...</div>
+    <main class="container">
+        
+        <section class="card">
+            <h1 class="title">A LETTER FOR THE FUTURE</h1>
+
+            <div class="top-row-content">
+                <!-- Kolom Kiri: Surat -->
+                <div class="letter-column">
+                    <label for="content">Isi Surat Anda (maks. 5000 karakter):</label>
+                    <textarea id="content" placeholder="Dear future me," rows="12" maxlength="5000"></textarea>
+                </div>
+
+                <!-- Kolom Kanan: Detail Penerima -->
+                <aside class="recipient-column">
+                    <label for="recipient-email">Email Penerima Utama</label>
+                    <input id="recipient-email" placeholder="kamu@email.com" type="email" required /> 
+
+                    <label for="letter-title">Nama Surat/Judul</label>
+                    <input type="text" id="letter-title" placeholder="Contoh: Pesan untuk Masa Kuliah">
+
+                    <label for="sender-name">Nama Pengirim</label>
+                    <input type="text" id="sender-name" placeholder="Contoh: Saya yang Sekarang">
+
+                    <div class="actions">
+                        <!-- Tombol utama -->
+                        <button id="send-btn" class="btn primary">
+                            <i class="fas fa-lock"></i>
+                            Kunci & Kirim Surat
+                        </button>
+                        <div id="loading-spinner" class="loading-spinner"></div>
+                    </div>
+                </aside>
+            </div>
+
+            <!-- Bagian Bawah: Waktu Pengiriman -->
+            <div class="bottom-row-content">
+                <label>Deliver on</label>
+                <div class="delivery-time-inputs">
+                    <div class="inline">
+                        <label for="delivery-date">Tanggal</label>
+                        <input id="delivery-date" type="date" required /> 
+                    </div>
+                    <div class="inline">
+                        <label for="delivery-time">Waktu (Jam:Menit)</label>
+                        <input id="delivery-time" type="time" step="60" value="00:00" required /> 
+                    </div>
+                </div>
+            </div>
+
+            <small class="hint">Catatan: Surat akan dikirimkan otomatis ke email penerima di masa depan.</small>
+        </section>
+
+        <!-- DAFTAR SURAT PENDING -->
+        <div class="pending-letters-section">
+            <h2 class="subtitle">Daftar Surat Masa Depan Anda</h2>
+            <ul id="letter-list" class="letter-list">
+                <!-- Surat dimuat di sini -->
+            </ul>
+            <p id="no-letters-message" class="no-letters">Belum ada surat yang dikunci. Mulailah menulis!</p>
+        </div>
+    </main>
+    
+    <!-- MODAL CUSTOM -->
+    <div id="custom-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 id="modal-title">Pesan</h3>
+            <p id="modal-body">Pesan Anda di sini.</p>
+            <button class="modal-close-btn" onclick="hideModal()">Tutup</button>
+        </div>
+    </div>
+
+    <!-- ANIMASI PENGIRIMAN (Overlay) -->
+    <div id="send-animation-overlay">
+        <div class="envelope-container">
+            <i class="fas fa-envelope envelope"></i>
+        </div>
+        <p class="animation-text">Mengunci Surat, Mengirim ke Masa Depan...</p>
+    </div>
+
+    <script type="module">
+        document.addEventListener('DOMContentLoaded', function() {
+            // Inisialisasi EmailJS
+            emailjs.init("YOUR_EMAILJS_USER_ID"); // Ganti dengan user ID EmailJS Anda
+            
+            // Update status
+            document.getElementById('auth-status').textContent = "Siap mengirim surat";
+            
+            // Load pending letters dari local storage
+            loadPendingLetters();
+            
+            // Event listener untuk tombol kirim
+            document.getElementById('send-btn').addEventListener('click', sendLetter);
+            
+            // Set minimum date to today
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('delivery-date').setAttribute('min', today);
+            
+            // Cek apakah ada surat yang perlu dikirim (untuk simulasi pengiriman terjadwal)
+            checkScheduledLetters();
+            
+            // Set interval untuk mengecek surat terjadwal setiap menit
+            setInterval(checkScheduledLetters, 60000);
+        });
+
+        // Fungsi untuk mengirim surat
+        function sendLetter() {
+            const recipientEmail = document.getElementById('recipient-email').value;
+            const letterTitle = document.getElementById('letter-title').value;
+            const senderName = document.getElementById('sender-name').value;
+            const content = document.getElementById('content').value;
+            const deliveryDate = document.getElementById('delivery-date').value;
+            const deliveryTime = document.getElementById('delivery-time').value;
+            
+            // Validasi input
+            if (!recipientEmail || !letterTitle || !senderName || !content || !deliveryDate || !deliveryTime) {
+                showModal("Error", "Harap isi semua field!");
+                return;
+            }
+            
+            // Validasi tanggal (tidak boleh di masa lalu)
+            const selectedDateTime = new Date(`${deliveryDate}T${deliveryTime}`);
+            const now = new Date();
+            if (selectedDateTime <= now) {
+                showModal("Error", "Tanggal dan waktu pengiriman harus di masa depan!");
+                return;
+            }
+            
+            // Tampilkan animasi pengiriman
+            document.getElementById('send-animation-overlay').style.display = 'flex';
+            
+            // Buat ID unik untuk surat
+            const letterId = Date.now().toString();
+            
+            // Buat objek surat
+            const letter = {
+                id: letterId,
+                recipientEmail,
+                letterTitle,
+                senderName,
+                content,
+                deliveryDate,
+                deliveryTime,
+                deliveryTimestamp: selectedDateTime.getTime(),
+                status: 'pending',
+                createdAt: new Date().toISOString()
+            };
+            
+            // Simpan ke local storage
+            saveLetterToLocalStorage(letter);
+            
+            // Reset form
+            document.getElementById('recipient-email').value = '';
+            document.getElementById('letter-title').value = '';
+            document.getElementById('sender-name').value = '';
+            document.getElementById('content').value = '';
+            document.getElementById('delivery-date').value = '';
+            document.getElementById('delivery-time').value = '00:00';
+            
+            // Sembunyikan animasi
+            document.getElementById('send-animation-overlay').style.display = 'none';
+            
+            // Tampilkan pesan sukses
+            showModal("Sukses", "Surat Anda berhasil dikunci dan akan dikirim pada waktu yang ditentukan!");
+            
+            // Perbarui daftar surat pending
+            loadPendingLetters();
+        }
+
+        // Fungsi untuk mengecek surat terjadwal
+        function checkScheduledLetters() {
+            const letters = JSON.parse(localStorage.getItem('futureLetters')) || [];
+            const now = new Date().getTime();
+            
+            letters.forEach(letter => {
+                if (letter.status === 'pending' && letter.deliveryTimestamp <= now) {
+                    // Kirim email
+                    sendScheduledEmail(letter);
+                }
+            });
+        }
+
+        // Fungsi untuk mengirim email terjadwal
+        function sendScheduledEmail(letter) {
+            emailjs.send("YOUR_SERVICE_ID", "YOUR_TEMPLATE_ID", {
+                to_email: letter.recipientEmail,
+                from_name: letter.senderName,
+                subject: letter.letterTitle,
+                message: letter.content,
+                delivery_date: letter.deliveryDate,
+                delivery_time: letter.deliveryTime
+            })
+            .then(function(response) {
+                console.log("Email terjadwal berhasil dikirim!", response.status, response.text);
+                
+                // Update status surat menjadi 'sent'
+                updateLetterStatus(letter.id, 'sent');
+                
+                // Tampilkan notifikasi (opsional)
+                if (document.visibilityState === 'visible') {
+                    showModal("Surat Terkirim", `Surat "${letter.letterTitle}" telah berhasil dikirim ke ${letter.recipientEmail}`);
+                }
+            }, function(error) {
+                console.error("Gagal mengirim email terjadwal:", error);
+                
+                // Update status surat menjadi 'failed'
+                updateLetterStatus(letter.id, 'failed');
+            });
+        }
+
+        // Fungsi untuk update status surat
+        function updateLetterStatus(letterId, status) {
+            let letters = JSON.parse(localStorage.getItem('futureLetters')) || [];
+            letters = letters.map(letter => {
+                if (letter.id === letterId) {
+                    letter.status = status;
+                    letter.sentAt = new Date().toISOString();
+                }
+                return letter;
+            });
+            localStorage.setItem('futureLetters', JSON.stringify(letters));
+            
+            // Perbarui tampilan jika halaman sedang aktif
+            if (document.visibilityState === 'visible') {
+                loadPendingLetters();
+            }
+        }
+
+        // Fungsi untuk menyimpan surat ke local storage
+        function saveLetterToLocalStorage(letter) {
+            let letters = JSON.parse(localStorage.getItem('futureLetters')) || [];
+            letters.push(letter);
+            localStorage.setItem('futureLetters', JSON.stringify(letters));
+        }
+
+        // Fungsi untuk menghapus surat dari local storage
+        function removeLetterFromLocalStorage(letterId) {
+            let letters = JSON.parse(localStorage.getItem('futureLetters')) || [];
+            letters = letters.filter(letter => letter.id !== letterId);
+            localStorage.setItem('futureLetters', JSON.stringify(letters));
+        }
+
+        // Fungsi untuk memuat daftar surat pending
+        function loadPendingLetters() {
+            const letters = JSON.parse(localStorage.getItem('futureLetters')) || [];
+            const letterList = document.getElementById('letter-list');
+            const noLettersMessage = document.getElementById('no-letters-message');
+            
+            // Kosongkan daftar
+            letterList.innerHTML = '';
+            
+            // Filter hanya surat yang masih pending
+            const pendingLetters = letters.filter(letter => letter.status === 'pending');
+            
+            if (pendingLetters.length > 0) {
+                pendingLetters.forEach(letter => {
+                    // Format tanggal dan waktu
+                    const deliveryDate = new Date(letter.deliveryTimestamp);
+                    const formattedDate = deliveryDate.toLocaleDateString('id-ID', {
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric'
+                    });
+                    const formattedTime = deliveryDate.toLocaleTimeString('id-ID', {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                    
+                    // Hitung sisa waktu
+                    const now = new Date();
+                    const timeLeft = deliveryDate - now;
+                    const daysLeft = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+                    const hoursLeft = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    
+                    // Buat elemen surat
+                    const letterItem = document.createElement('li');
+                    letterItem.className = 'letter-item';
+                    letterItem.innerHTML = `
+                        <div class="letter-header">
+                            <h3>${letter.letterTitle}</h3>
+                            <span class="letter-status">Pending</span>
+                        </div>
+                        <div class="letter-details">
+                            <p><strong>Penerima:</strong> ${letter.recipientEmail}</p>
+                            <p><strong>Pengirim:</strong> ${letter.senderName}</p>
+                            <p><strong>Dikirim pada:</strong> ${formattedDate} pukul ${formattedTime}</p>
+                            <p><strong>Sisa waktu:</strong> ${daysLeft} hari ${hoursLeft} jam</p>
+                        </div>
+                        <div class="letter-actions">
+                            <button class="btn small danger" onclick="deleteLetter('${letter.id}')">Hapus</button>
+                        </div>
+                    `;
+                    
+                    letterList.appendChild(letterItem);
+                });
+                
+                // Sembunyikan pesan "belum ada surat"
+                noLettersMessage.style.display = 'none';
+            } else {
+                // Tampilkan pesan "belum ada surat"
+                noLettersMessage.style.display = 'block';
+            }
+        }
+
+        // Fungsi untuk menghapus surat
+        function deleteLetter(letterId) {
+            if (confirm("Apakah Anda yakin ingin menghapus surat ini?")) {
+                removeLetterFromLocalStorage(letterId);
+                showModal("Sukses", "Surat berhasil dihapus");
+                loadPendingLetters();
+            }
+        }
+
+        // Fungsi untuk menampilkan modal
+        function showModal(title, message) {
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-body').textContent = message;
+            document.getElementById('custom-modal').style.display = 'flex';
+        }
+
+        // Fungsi untuk menyembunyikan modal
+        function hideModal() {
+            document.getElementById('custom-modal').style.display = 'none';
+        }
+
+        // Export fungsi untuk penggunaan global
+        window.deleteLetter = deleteLetter;
+        window.hideModal = hideModal;
+    </script>
+</body>
+</html>
